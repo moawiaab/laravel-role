@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Models;
+namespace Moawiaab\Role\Models;
 
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Moawiaab\Role\Support\HasAdvancedFilter;
 
 class Account extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    use HasAdvancedFilter;
 
     public $table = 'accounts';
     protected $orderable = [

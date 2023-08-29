@@ -19,12 +19,12 @@ class RoleServiceProvider extends ServiceProvider
             __DIR__ . '/../database/seeders/' => database_path('seeders')
         ], 'role-migrations');
 
-        $this->publishes([
-            __DIR__ . '/Models' => app_path('Models')
-        ], 'role-migrations');
+        // $this->publishes([
+        //     __DIR__ . '/Models' => app_path('Models')
+        // ], 'role-migrations');
 
-        $this->publishes([
-            __DIR__ . '/Http/Middleware/' => app_path('Http/Middleware')
-        ], 'role-migrations');
+        // $this->publishes([
+        //     __DIR__ . '/Http/Middleware/' => app_path('Http/Middleware')
+        // ], 'role-migrations');
     }
 }

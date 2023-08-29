@@ -1,6 +1,6 @@
 <?php
 
-namespace Moawiaab\Role\App\Support;
+namespace Moawiaab\Role\Support;
 
 use Illuminate\Validation\ValidationException;
 

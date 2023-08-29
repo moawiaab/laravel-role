@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace Moawiaab\Role\Http\Middleware;
 
-use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Support\Facades\Gate;
+use Moawiaab\Role\Models\Role;
 
 class AuthGates
 {

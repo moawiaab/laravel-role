@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Account;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Moawiaab\Role\Models\Account;
+use Moawiaab\Role\Models\Role;
 
 class AccountSeeder extends Seeder
 {
