@@ -1,0 +1,25 @@
+{
+    "name": "moawiaab/role",
+    "description": "set role to app",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Moawiaab\\Role\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "moawiaab",
+            "email": "moawiaab@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Moawiaab\\Role\\RoleServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}
