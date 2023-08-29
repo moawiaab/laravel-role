@@ -3,6 +3,7 @@
 namespace Moawiaab\Role\Support;
 
 use Illuminate\Validation\ValidationException;
+use Moawiaab\Role\Support\FilterQueryBuilder;
 
 trait HasAdvancedFilter
 {

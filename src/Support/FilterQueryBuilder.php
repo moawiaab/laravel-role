@@ -5,6 +5,7 @@ namespace Moawiaab\Role\Support;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
+
 class FilterQueryBuilder
 {
     protected $model;
