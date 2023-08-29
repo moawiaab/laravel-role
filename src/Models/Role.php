@@ -6,13 +6,11 @@ use \DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Moawiaab\Role\App\Support\HasAdvancedFilter;
 
 class Role extends Model
 {
     use SoftDeletes;
     use HasFactory;
-    use HasAdvancedFilter;
 
     public $table = 'roles';
 
