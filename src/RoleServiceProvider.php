@@ -8,19 +8,23 @@ class RoleServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         $this->publishes([
-            __DIR__.'/database/migrations/' => database_path('migrations')
+            __DIR__ . '/../database/migrations/' => database_path('migrations')
         ], 'role-migrations');
 
         $this->publishes([
-            __DIR__.'/database/seeders/' => database_path('seeders')
+            __DIR__ . '/../database/seeders/' => database_path('seeders')
         ], 'role-migrations');
 
         $this->publishes([
-            __DIR__.'/app/Models/' => app_path('Models')
+            __DIR__ . '/Models' => app_path('Models')
+        ], 'role-migrations');
+
+        $this->publishes([
+            __DIR__ . '/Http/Middleware/' => app_path('Http/Middleware')
         ], 'role-migrations');
     }
 }
