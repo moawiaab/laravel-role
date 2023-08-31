@@ -32,6 +32,20 @@ class InstallCommand extends Command implements PromptsForMissingInput
      */
     public function handle()
     {
+        if (!in_array($this->argument('stack'), ['inertia', 'api'])) {
+            $this->components->error('Invalid stack. Supported stacks are [inertia] and [api].');
+
+            return 1;
+        }
+
+        // Publish...
+        // $this->callSilent('vendor:publish', ['--tag' => 'jetstream-config', '--force' => true]);
+
+        // if (file_exists(resource_path('views/welcome.blade.php'))) {
+        //     $this->replaceInFile('/home', '/dashboard', resource_path('views/welcome.blade.php'));
+        //     $this->replaceInFile('Home', 'Dashboard', resource_path('views/welcome.blade.php'));
+        // }
+
         $this->updateNodePackages(function ($packages) {
             return [
                 "postcss-rtlcss" => "^4.0.7",
@@ -52,7 +66,16 @@ class InstallCommand extends Command implements PromptsForMissingInput
         // set Middleware classes
         $this->installMiddlewareAfter('SubstituteBindings::class', '\Moawiaab\Role\Http\Middleware\AuthGates::class');
 
-        $this->installInertiaStack();
+        // Install Stack...
+        if ($this->argument('stack') === 'api') {
+            if (!$this->installApiStack()) {
+                return 1;
+            }
+        } elseif ($this->argument('stack') === 'inertia') {
+            if (!$this->installInertiaStack()) {
+                return 1;
+            }
+        }
     }
 
     /**
@@ -89,8 +112,8 @@ class InstallCommand extends Command implements PromptsForMissingInput
         copy(__DIR__ . '/../../stubs/inertia/postcss.config.cjs', base_path('postcss.config.cjs'));
         copy(__DIR__ . '/../../stubs/inertia/vite.config.js', base_path('vite.config.js'));
         copy(__DIR__ . '/../../stubs/inertia/resources/sass/quasar-variables.sass', resource_path('sass/quasar-variables.sass'));
-
-        copy(__DIR__ . '/../../stubs/inertia/resources/js/app.js', resource_path('js/app.js'));
+        
+        copy(__DIR__.'/../../stubs/inertia/resources/js/app.js', resource_path('js/app.js'));
 
         if (file_exists(base_path('pnpm-lock.yaml'))) {
             $this->runCommands(['pnpm install', 'pnpm run build']);

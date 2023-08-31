@@ -26,6 +26,8 @@ class RoleServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
+        $this->configureCommands();
+
         $this->publishes([
             __DIR__ . '/../database/migrations/' => database_path('migrations')
         ], 'role-migrations');
