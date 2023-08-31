@@ -9,6 +9,8 @@ use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
+use Illuminate\Filesystem\Filesystem;
+
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\select;
@@ -115,7 +117,7 @@ class InstallCommand extends Command implements PromptsForMissingInput
         }
         copy(__DIR__ . '/../../stubs/inertia/postcss.config.cjs', base_path('postcss.config.cjs'));
         copy(__DIR__ . '/../../stubs/inertia/vite.config.js', base_path('vite.config.js'));
-        copy(__DIR__ . '/../../stubs/inertia/resources/sass/quasar-variables.sass', resource_path('sass/quasar-variables.sass'));
+        (new Filesystem)->copyDirectory(__DIR__ . '/../../stubs/inertia/resources/sass/quasar-variables.sass', resource_path('sass/quasar-variables.sass'));
         
         copy(__DIR__.'/../../stubs/inertia/resources/js/app.js', resource_path('js/app.js'));
 
