@@ -31,20 +31,6 @@ class InstallCommand extends Command implements PromptsForMissingInput
      */
     public function handle()
     {
-        if (!in_array($this->argument('stack'), ['inertia', 'api'])) {
-            $this->components->error('Invalid stack. Supported stacks are [inertia] and [api].');
-
-            return 1;
-        }
-
-        // Publish...
-        // $this->callSilent('vendor:publish', ['--tag' => 'jetstream-config', '--force' => true]);
-
-        // if (file_exists(resource_path('views/welcome.blade.php'))) {
-        //     $this->replaceInFile('/home', '/dashboard', resource_path('views/welcome.blade.php'));
-        //     $this->replaceInFile('Home', 'Dashboard', resource_path('views/welcome.blade.php'));
-        // }
-
         $this->updateNodePackages(function ($packages) {
             return [
                 "postcss-rtlcss" => "^4.0.7",
@@ -65,16 +51,7 @@ class InstallCommand extends Command implements PromptsForMissingInput
         // set Middleware classes
         $this->installMiddlewareAfter('SubstituteBindings::class', '\Moawiaab\Role\Http\Middleware\AuthGates::class');
 
-        // Install Stack...
-        if ($this->argument('stack') === 'api') {
-            if (!$this->installApiStack()) {
-                return 1;
-            }
-        } elseif ($this->argument('stack') === 'inertia') {
-            if (!$this->installInertiaStack()) {
-                return 1;
-            }
-        }
+        $this->installInertiaStack();
     }
 
     /**
