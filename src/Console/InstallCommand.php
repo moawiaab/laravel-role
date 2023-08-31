@@ -91,7 +91,6 @@ class InstallCommand extends Command implements PromptsForMissingInput
     protected function installApiStack()
     {
         // Terms Of Service / Privacy Policy...
-        copy(__DIR__ . '/../../stubs/resources/markdown/terms.md', resource_path('markdown/terms.md'));
 
         $this->line('');
         $this->components->info('Api scaffolding installed successfully.');
@@ -272,8 +271,6 @@ class InstallCommand extends Command implements PromptsForMissingInput
             label: 'Would you like any optional features?',
             options: collect([
                 'teams' => 'Team support',
-                'api' => 'API support',
-                'verification' => 'Email verification',
                 'dark' => 'Dark mode',
             ])->when(
                 $input->getArgument('stack') === 'inertia',
