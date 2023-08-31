@@ -4,6 +4,8 @@ namespace Moawiaab\Role;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\Contracts\Http\Kernel;
+
 
 class RoleServiceProvider extends ServiceProvider
 {
