@@ -277,11 +277,5 @@ class InstallCommand extends Command implements PromptsForMissingInput
                 fn ($options) => $options->put('ssr', 'Inertia SSR')
             )->sort()->all(),
         ))->each(fn ($option) => $input->setOption($option, true));
-
-        $input->setOption('pest', select(
-            label: 'Which testing framework do you prefer?',
-            options: ['PHPUnit', 'Pest'],
-            default: $this->isUsingPest() ? 'Pest' : 'PHPUnit',
-        ) === 'Pest');
     }
 }
