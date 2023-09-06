@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Illuminate\Filesystem\Filesystem;
-
+use Symfony\Component\Finder\Finder;
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\select;
@@ -22,7 +22,11 @@ class InstallCommand extends Command implements PromptsForMissingInput
      *
      * @var string
      */
-    protected $signature = 'moawiaab-role:install {stack : The development stack that should be installed (inertia,api)}
+    protected $signature = 'moawiaab-role:install {stack : The development stack that should be installed (quasar,tailwind)}
+                                                  {--dark : Indicate that dark mode support should be installed}
+                                                  {--lang : Make Arabic the default language}
+                                                  {--pinia : Indicates if pinia support should be installed}
+                                                  {--persistedstate : Indicates if pinia-plugin-persistedstate support should be installed}
                                                   {--composer=global : Absolute path to the Composer binary which should be used to install packages}';
 
     /**
@@ -39,8 +43,8 @@ class InstallCommand extends Command implements PromptsForMissingInput
      */
     public function handle()
     {
-        if (!in_array($this->argument('stack'), ['inertia', 'api'])) {
-            $this->components->error('Invalid stack. Supported stacks are [inertia] and [api].');
+        if (!in_array($this->argument('stack'), ['quasar', 'tailwind'])) {
+            $this->components->error('Invalid stack. Supported stacks are [quasar] and [tailwind].');
 
             return 1;
         }
@@ -53,33 +57,34 @@ class InstallCommand extends Command implements PromptsForMissingInput
         //     $this->replaceInFile('Home', 'Dashboard', resource_path('views/welcome.blade.php'));
         // }
 
-        $this->updateNodePackages(function ($packages) {
-            return [
-                "postcss-rtlcss" => "^4.0.7",
-                "@quasar/vite-plugin" => "^1.4.1",
-            ] + $packages;
-        });
-
-        $this->updateNodePackages(function ($packages) {
-            return [
-                "@quasar/extras" => "^1.16.5",
-                "vue-i18n" => "^9.3.0-beta.25",
-                "pinia" => "^2.1.6",
-                "pinia-plugin-persistedstate" => "^3.2.0",
-                "quasar" => "^2.12.5",
-            ] + $packages;
-        }, false);
-
         // set Middleware classes
         $this->installMiddlewareAfter('SubstituteBindings::class', '\Moawiaab\Role\Http\Middleware\AuthGates::class');
 
+
+        if ($this->option('pinia')) {
+            $this->updateNodePackages(function ($packages) {
+                return [
+                    "pinia" => "^2.1.6"
+                ] + $packages;
+            });
+        }
+
+        if ($this->option('persistedstate')) {
+            $this->updateNodePackages(function ($packages) {
+                return [
+                    "pinia" => "^2.1.6",
+                    "pinia-plugin-persistedstate" => "^3.2.0"
+                ] + $packages;
+            });
+        }
+
         // Install Stack...
-        if ($this->argument('stack') === 'api') {
-            if (!$this->installApiStack()) {
+        if ($this->argument('stack') === 'tailwind') {
+            if (!$this->installTailwindStack()) {
                 return 1;
             }
-        } elseif ($this->argument('stack') === 'inertia') {
-            if (!$this->installInertiaStack()) {
+        } elseif ($this->argument('stack') === 'quasar') {
+            if (!$this->installQuasarStack()) {
                 return 1;
             }
         }
@@ -90,12 +95,20 @@ class InstallCommand extends Command implements PromptsForMissingInput
      *
      * @return bool
      */
-    protected function installApiStack()
+    protected function installTailwindStack()
     {
         // Terms Of Service / Privacy Policy...
 
+        if (!$this->option('dark')) {
+            $this->removeDarkClasses((new Finder)
+                    ->in(resource_path('js'))
+                    ->name('*.vue')
+                    ->notPath('Pages/Welcome.vue')
+            );
+        }
+
         $this->line('');
-        $this->components->info('Api scaffolding installed successfully.');
+        $this->components->info('tailwindcss theme installed successfully.');
 
         return true;
     }
@@ -106,7 +119,7 @@ class InstallCommand extends Command implements PromptsForMissingInput
      *
      * @return bool
      */
-    protected function installInertiaStack()
+    protected function installQuasarStack()
     {
         if (file_exists(base_path('postcss.config.js'))) {
             unlink(base_path('postcss.config.js'));
@@ -118,8 +131,37 @@ class InstallCommand extends Command implements PromptsForMissingInput
         copy(__DIR__ . '/../../stubs/inertia/postcss.config.cjs', base_path('postcss.config.cjs'));
         copy(__DIR__ . '/../../stubs/inertia/vite.config.js', base_path('vite.config.js'));
         (new Filesystem)->copyDirectory(__DIR__ . '/../../stubs/inertia/resources/sass/quasar-variables.sass', resource_path('sass/quasar-variables.sass'));
-        
-        copy(__DIR__.'/../../stubs/inertia/resources/js/app.js', resource_path('js/app.js'));
+        (new Filesystem)->copyDirectory(__DIR__.'/../../stubs/inertia/resources/js/i18n', resource_path('js/i18n'));
+        copy(__DIR__ . '/../../stubs/inertia/resources/js/app.js', resource_path('js/app.js'));
+
+        $this->updateNodePackages(function ($packages) {
+            return [
+                "@quasar/vite-plugin" => "^1.4.1",
+            ] + $packages;
+        });
+
+        $this->updateNodePackages(function ($packages) {
+            return [
+                "@quasar/extras" => "^1.16.6",
+                "quasar" => "^2.12.5",
+            ] + $packages;
+        }, false);
+
+        if ($this->option('lang')) {
+            $this->updateNodePackages(function ($packages) {
+                return [
+                    "postcss-rtlcss" => "^4.0.7",
+                    "vue-i18n" => "^9.3.0-beta.25",
+                ] + $packages;
+            });
+
+            $this->replaceInFile('locale: "en-US",', 'locale: "ar",', resource_path('js/app.js'));
+            $this->replaceInFile('lang: quasarLangEn,', 'lang: quasarLangAr,', resource_path('js/app.js'));
+            $this->replaceInFile('rtl: false', 'rtl: true', resource_path('js/app.js'));
+
+        }
+
+
 
         if (file_exists(base_path('pnpm-lock.yaml'))) {
             $this->runCommands(['pnpm install', 'pnpm run build']);
@@ -131,21 +173,9 @@ class InstallCommand extends Command implements PromptsForMissingInput
 
 
         $this->line('');
-        $this->components->info('Inertia scaffolding installed successfully.');
+        $this->components->info('quasar theme installed successfully.');
 
         return true;
-    }
-
-    /**
-     * Returns the path to the correct test stubs.
-     *
-     * @return string
-     */
-    protected function getTestStubsPath()
-    {
-        return $this->option('pest') || $this->isUsingPest()
-            ? __DIR__ . '/../../stubs/pest-tests'
-            : __DIR__ . '/../../stubs/tests';
     }
 
     /**
@@ -214,30 +244,6 @@ class InstallCommand extends Command implements PromptsForMissingInput
         });
     }
 
-
-    protected function promptForMissingArgumentsUsing()
-    {
-        return [
-            'stack' => fn () => select(
-                label: 'Which moawiaab-role stack would you like to install?',
-                options: [
-                    'inertia' => 'Vue with quasar',
-                    'api' => 'Vue with api',
-                ]
-            ),
-        ];
-    }
-
-    /**
-     * Determine whether the project is already using Pest.
-     *
-     * @return bool
-     */
-    protected function isUsingPest()
-    {
-        return class_exists(\Pest\TestSuite::class);
-    }
-
     protected function installMiddlewareAfter($after, $name, $group = 'web')
     {
         $httpKernel = file_get_contents(app_path('Http/Kernel.php'));
@@ -260,7 +266,21 @@ class InstallCommand extends Command implements PromptsForMissingInput
         }
     }
 
-        /**
+
+    protected function promptForMissingArgumentsUsing()
+    {
+        return [
+            'stack' => fn () => select(
+                label: 'Which moawiaab-role theme would you like to install?',
+                options: [
+                    'quasar' => 'quasar',
+                    'tailwind' => 'tailwind',
+                ]
+            ),
+        ];
+    }
+
+    /**
      * Interact further with the user if they were prompted for missing arguments.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
@@ -272,12 +292,21 @@ class InstallCommand extends Command implements PromptsForMissingInput
         collect(multiselect(
             label: 'Would you like any optional features?',
             options: collect([
-                'teams' => 'Team support',
-                'dark' => 'Dark mode',
+                'pinia' => 'pinia store',
+                'persistedstate' => 'pinia plugin persistedstate',
             ])->when(
-                $input->getArgument('stack') === 'inertia',
-                fn ($options) => $options->put('ssr', 'Inertia SSR')
-            )->sort()->all(),
+                $input->getArgument('stack') === 'tailwind',
+                fn ($options) => $options->put('dark', 'Dark mode')
+            )->when(
+                $input->getArgument('stack') === 'quasar',
+                fn ($options) => $options->put('lang', 'Select Arabic language')
+            )->sort()->sort()->all(),
         ))->each(fn ($option) => $input->setOption($option, true));
+
+        // $input->setOption('pest', select(
+        //     label: 'Which testing framework do you prefer?',
+        //     options: ['PHPUnit', 'Pest'],
+        //     default: 'default',
+        // ) === 'Pest');
     }
 }

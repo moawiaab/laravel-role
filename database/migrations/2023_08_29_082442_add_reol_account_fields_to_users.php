@@ -12,8 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->tinyText('local')->default('ar');
+            $table->string('phone',30)->nullable();
             $table->unsignedBigInteger('role_id')->references('id')->on('roles')->nullable();
             $table->unsignedBigInteger('account_id')->references('id')->on('accounts')->nullable();
+            $table->softDeletes();
         });
     }
 

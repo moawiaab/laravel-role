@@ -5,7 +5,7 @@ namespace Moawiaab\Role;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\Contracts\Http\Kernel;
-
+use Moawiaab\Role\Http\Middleware\AuthGates;
 
 class RoleServiceProvider extends ServiceProvider
 {
@@ -37,6 +37,7 @@ class RoleServiceProvider extends ServiceProvider
         ], 'role-migrations');
 
         copy(__DIR__.'/Models/User.php', app_path('Models/User.php'));
+        copy(__DIR__.'/Http/Middleware/HandleInertiaRequests.php', app_path('Http/Middleware/HandleInertiaRequests.php'));
         
         // if (config('role.stack') === 'inertia') {
         // }
@@ -76,8 +77,8 @@ class RoleServiceProvider extends ServiceProvider
     {
         $kernel = $this->app->make(Kernel::class);
 
-        $kernel->appendMiddlewareToGroup('web', ShareInertiaData::class);
-        $kernel->appendToMiddlewarePriority(ShareInertiaData::class);
+        $kernel->appendMiddlewareToGroup('web', AuthGates::class);
+        $kernel->appendToMiddlewarePriority(AuthGates::class);
 
         if (class_exists(HandleInertiaRequests::class)) {
             $kernel->appendToMiddlewarePriority(HandleInertiaRequests::class);

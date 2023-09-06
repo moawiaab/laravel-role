@@ -3,7 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -21,6 +24,31 @@ class User extends Authenticatable
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasAdvancedFilter;
+    use SoftDeletes;
+
+
+    protected $dates = [
+        'email_verified_at',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
+
+    protected $orderable = [
+        'id',
+        'name',
+        'email',
+        'phone',
+        'role.title',
+    ];
+
+    protected $filterable = [
+        'id',
+        'name',
+        'email',
+        'role.title',
+        'phone',
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -63,11 +91,32 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where($field ?? 'id', $value)->withTrashed()->firstOrFail();
+    }
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['trashed'] ?? null, function ($query, $trashed) {
+            if ($trashed === 'with') {
+                $query->withTrashed();
+            } elseif ($trashed === 'only') {
+                $query->onlyTrashed();
+            }
+        });
+    }
+
+
     public function role() {
         return $this->belongsTo(Role::class);
     }
 
     public function account() {
         return $this->belongsTo(Account::class);
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 }
