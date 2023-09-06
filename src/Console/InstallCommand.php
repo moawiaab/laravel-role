@@ -131,8 +131,8 @@ class InstallCommand extends Command implements PromptsForMissingInput
         copy(__DIR__ . '/../../stubs/inertia/postcss.config.cjs', base_path('postcss.config.cjs'));
         copy(__DIR__ . '/../../stubs/inertia/vite.config.js', base_path('vite.config.js'));
         (new Filesystem)->copyDirectory(__DIR__ . '/../../stubs/inertia/resources/sass/quasar-variables.sass', resource_path('sass/quasar-variables.sass'));
-        (new Filesystem)->copyDirectory(__DIR__.'/../../stubs/inertia/resources/js/i18n', resource_path('js/i18n'));
-        copy(__DIR__ . '/../../stubs/inertia/resources/js/app.js', resource_path('js/app.js'));
+        (new Filesystem)->copyDirectory(__DIR__.'/../../stubs/inertia/resources/js', resource_path('js'));
+        // copy(__DIR__ . '/../../stubs/inertia/resources/js/app.js', resource_path('js/app.js'));
 
         $this->updateNodePackages(function ($packages) {
             return [
